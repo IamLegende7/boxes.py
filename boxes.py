@@ -55,7 +55,7 @@ def tui(stdscr):
         win.border(0)
         return win
 
-    def menu(y: int, x: int, options: list, command: list, selected_option: int=0, bold: bool=False, allow_back: bool=False):
+    def menu(y: int, x: int, options: list, commands: list, selected_option: int=0, bold: bool=False, allow_back: bool=False):
         # Display the menu
         for idx, option in enumerate(options):
             if idx == selected_option:
@@ -100,7 +100,7 @@ def tui(stdscr):
                     selected_option += 1  # Move down
 
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
-                command[selected_option]()
+                commands[selected_option]()
                 return False, selected_option
             elif key in (curses.KEY_BACKSPACE, 127, 8):
                 if allow_back:
