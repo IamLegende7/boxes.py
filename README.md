@@ -61,7 +61,7 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
    Examples:
 
    ```Python
-   back, sel = menu(0, 0, ["Say 'UWU'", "Get the Hell out of there"], [example_text, bye], 0, True, True)  # Example on how to use the menu function
+   back, sel = menu(5, 2, ["Say Hello", "Write Something", "Read that something", "Quit"], [example_text, scribe_write, scribe_read, bye], 0, True, True)  # Example on how to use the menu function
    ```
 
    ```back``` will be true, if the menu was left using backspace, allowing for something like this:
@@ -84,9 +84,58 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
    back, sel = menu(0, 0, options, commands, 0, True, False)
    chosen_option = options_to_process[sel]
    ```
-   
+5. ```scribe```
+    
+    Scribe is a simple text "editor". It allows for most characters to be written and can be navigated using the arrow-keys and home & end keys.
+    
+    It comes with text-wrap build-in.
+
+    I am currently working on a scrolling ability for longer texts.
+
+    In the examples below, the function is used to write and read a file, called ```Text.txt```.
+
+    ```Python
+    def scribe_write():
+        text = ""
+        with open("Text.txt", "r") as txt_file:
+            for x in txt_file:
+                text = text + x
+        stdscr.clear()
+        height, width = stdscr.getmaxyx()
+        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
+        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        scribe_win = window(height - 5, width - 3, 4, 1, False)
+        text = scribe(scribe_win, text)
+        if not isinstance(text, bool):
+            with open("Text.txt", "w") as txt_file:
+                txt_file.write(text)
+        return
+    
+    def scribe_read():
+        text = ""
+        with open("Text.txt", "r") as txt_file:
+            for x in txt_file:
+                text = text + x
+        stdscr.clear()
+        height, width = stdscr.getmaxyx()
+        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
+        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        scribe_win = window(height - 5, width - 3, 4, 1, False)
+        scribe(scribe_win, text, True)
+        return
+    ```
+
+    The scribe function requiers a window, to work in and a starting text in the form of a string.
+    
+    If the 3rd function, ```read_only``, is set to ```True``` the text can only be viewed, not edited.
+
+    The scribe function will return the edited Text, if the editor was left with F2 (aka the text was saved), otherwise it will return ```False```.
 
 ## Structure
+
+Obviosly not a must, but I like this structure
 
 **Pages**
 
@@ -94,44 +143,76 @@ In the function ``` tui ``` remove (or change) the give examples listed under th
 
 ```Python
 # Pages
-    def example_text():
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(1, 2, "Example Text")
-        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(5, 2, "[ Hewo! ] >  UWU")
-        stdscr.getch()
-        main()
+def scribe_write():
+    text = ""
+    with open("Text.txt", "r") as txt_file:
+        for x in txt_file:
+            text = text + x
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
+    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    scribe_win = window(height - 5, width - 3, 4, 1, False)
+    text = scribe(scribe_win, text)
+    if not isinstance(text, bool):
+        with open("Text.txt", "w") as txt_file:
+            txt_file.write(text)
+    return
     
-    def no_back(sel):
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(1, 2, "No")
-        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(5, 2, "U cant back out of tis <3")
-        stdscr.addstr(7, 2, f"Selected option was: {sel}")
-        stdscr.getch()
-        main()
+def scribe_read():
+    text = ""
+    with open("Text.txt", "r") as txt_file:
+        for x in txt_file:
+            text = text + x
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
+    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    scribe_win = window(height - 5, width - 3, 4, 1, False)
+    scribe(scribe_win, text, True)
+    return
 
-    def main():
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")  # Example for the box function
-        stdscr.addstr(1, 2, "Main Menu")
-        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        back, sel = menu(5, 2, ["Say 'UWU'", "Get the Hell out of there"], [example_text, bye], 0, True, True)  # Example on how to use the menu function
-        if back:    # You can also do something when backspace is pressed (like go back one page or something) ... have to set allow_back = True
-            no_back(sel)
+def example_text():
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(1, 2, "Example Text")
+    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(5, 2, "Hello World!")
+    stdscr.getch()
+    return
+    
+def back_page(sel):
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(1, 2, "No")
+    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    stdscr.addstr(5, 2, "U cant back out of tis <3")
+    stdscr.addstr(7, 2, f"Selected option was: {sel}")
+    stdscr.getch()
+    return
+
+def main():
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")  # Example for the box function
+    stdscr.addstr(1, 2, "Main Menu")
+    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+    while True:
+        back, sel = menu(5, 2, ["Say Hello", "Write Something", "Read that something", "Quit"], [example_text, scribe_write, scribe_read, bye], 0, True, True)  # Example on how to use the menu function
+        if back:    # You can also do something when backspace is pressed (like go back one page or something) ... have to set allow_back = True though
+            back_page(sel)
 ```
-You can then later call these functions to call the diffrent pages you want. (Obviosly not a must, but I like this structure)
+You can then later call these functions to call the diffrent pages you want.
 
 **Main code**
 
-Under the comment ``` # Main code ``` ( still in the ``` tui ``` function ) you can add your main code.
+Under the comment ``` # Main code ``` (still in the ``` tui ``` function) you can add your main code.
 
-Again: you would want to add the page-related code to the pages functions, however here you can call the first page and set some varibles first
+Again: you would want to add all the page-related code to the pages functions, however here you can call the first page and set some varibles first
 
 ```Python
     # Main code
