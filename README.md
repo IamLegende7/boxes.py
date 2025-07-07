@@ -90,9 +90,9 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
     
     It comes with text-wrap build-in.
 
-    I am currently working on a scrolling ability for longer texts.
+    It even has a srcolling feature for longer texts!
 
-    In the examples below, the function is used to write and read a file called ```Text.txt```.
+    In the examples below, the function is used to write and read a file, called ```Text.txt```.
 
     ```Python
     def scribe_write():

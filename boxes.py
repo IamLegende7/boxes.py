@@ -117,11 +117,21 @@ def tui(stdscr):
                     return True, selected_option
     
     def scribe(scribe_win, scribe_text: str = "", read_only: bool=False):
-        height, width = stdscr.getmaxyx()
+        scroll = 0
+        max_width = stdscr.getmaxyx()[1]
         cursor_pos = 0
         curses.curs_set(1)
         key = False
+        newline_trigger = False
+        cursor_y = 0
+        height = 100
         while True:
+            if ( key == curses.KEY_DOWN and cursor_y < lines ) or key == 10 or newline_trigger:
+                if cursor_y >= height + scroll - 1:
+                    scroll += 1
+            if cursor_y == 0 + scroll and scroll > 0:
+                scroll -= 1
+            newline_trigger = False
             # Key logic
             if key == curses.KEY_LEFT:
                 if cursor_pos > 0:
@@ -142,7 +152,7 @@ def tui(stdscr):
                             line_width += 5
                         else:
                             line_width += 1
-                        if line_width >= scribe_win.getmaxyx()[1]:
+                        if line_width >= width:
                             n += 1
                             break
                         n += 1
@@ -154,13 +164,13 @@ def tui(stdscr):
                             break
                         elif scribe_text[cursor_pos] == "\t":
                             x += 5
-                            if x >= scribe_win.getmaxyx()[1]:
+                            if x >= width:
                                 break
                         else:
                             x += 1
-                            if x >= scribe_win.getmaxyx()[1]:
+                            if x >= width:
                                 break
-                        cursor_pos += 1
+                        cursor_pos += 1 
             elif key == curses.KEY_UP:
                 if cursor_y > 0:
                     # Find the start of the previous line
@@ -226,6 +236,7 @@ def tui(stdscr):
                 cursor_pos += 1
             
             # Rendering the text
+            height, width = scribe_win.getmaxyx()
             scribe_win.clear()
             x_pos = 0
             y_pos = 0
@@ -240,34 +251,40 @@ def tui(stdscr):
                     line_lengths.append(line_length)
                     line_length = 0
                 elif scribe_text[x] == "\t":
-                    if x_pos + 5 >= width - 3:
+                    if x_pos + 5 >= max_width - 3:
                         y_pos += 1
                         x_pos = 0
                         line_lengths.append(line_length)
+                        newline_trigger = True
                         line_length = 0
                     else:
                         x_pos += 5
                         line_length += 1
                 else:
-                    if x_pos + 1 >= width - 3:
+                    if x_pos + 1 >= max_width - 3:
                         y_pos += 1
                         x_pos = 0
                         line_lengths.append(line_length)
+                        newline_trigger = True
                         line_length = 0
-                        scribe_win.addstr(y_pos, x_pos, scribe_text[x])
+                        if y_pos - scroll >= 0 and y_pos - scroll < height:
+                            scribe_win.addstr(y_pos - scroll, x_pos, scribe_text[x])
                     else:
-                        scribe_win.addstr(y_pos, x_pos, scribe_text[x])
+                        if y_pos - scroll >= 0 and y_pos - scroll < height:
+                            scribe_win.addstr(y_pos - scroll, x_pos, scribe_text[x])
                         x_pos += 1
                         line_length += 1
-                    
                 if cursor_pos == x + 1:
                     cursor_x = x_pos
                     cursor_y = y_pos
             lines = y_pos
             line_lengths.append(line_length)
-            scribe_win.move(cursor_y, cursor_x)
+            stdscr.addstr(1, width - max(5, len(f"{cursor_x} {cursor_y}")) - 1, f"{cursor_x} {cursor_y}")
+            scribe_win.move(cursor_y - scroll, cursor_x)
+            stdscr.refresh()
             scribe_win.refresh()
             key = stdscr.getch()
+            stdscr.addstr(1, width - max(5, len(f"{cursor_x} {cursor_y}")) - 1, " " * max(5, len(f"{cursor_x} {cursor_y}")))
 
     # Pages
     def scribe_write():
@@ -295,7 +312,7 @@ def tui(stdscr):
         stdscr.clear()
         height, width = stdscr.getmaxyx()
         box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
+        stdscr.addstr(1, 2, "Scribe  ---  Exit: F2, F4")
         box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
         scribe_win = window(height - 5, width - 3, 4, 1, False)
         scribe(scribe_win, text, True)
