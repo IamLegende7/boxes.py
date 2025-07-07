@@ -127,7 +127,7 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
         return
     ```
 
-    The scribe function requiers a window, to work in and a starting text in the form of a string.
+    The scribe function requires a window, to work in and a starting text in the form of a string.
     
     If the 3rd function, ```read_only``, is set to ```True``` the text can only be viewed, not edited.
 

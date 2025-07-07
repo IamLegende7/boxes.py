@@ -230,7 +230,7 @@ def tui(stdscr):
                 return False
             elif key == False:
                 nothing()
-            elif key >= 32 and key <= 126 and not read_only:  # Add printable characters to the text
+            elif key in range(32, 126) or key in ( 167, 176 ) and not read_only:  # Add printable characters to the text
                 # Add a char to the text
                 scribe_text = scribe_text[:cursor_pos] + chr(key) + scribe_text[cursor_pos:]
                 cursor_pos += 1
