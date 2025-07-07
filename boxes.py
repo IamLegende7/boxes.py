@@ -234,6 +234,11 @@ def tui(stdscr):
                 # Add a char to the text
                 scribe_text = scribe_text[:cursor_pos] + chr(key) + scribe_text[cursor_pos:]
                 cursor_pos += 1
+            elif read_only == True:
+                scribe_win.clear()
+                scribe_win.refresh()
+                curses.curs_set(0) 
+                return scribe_text
             
             # Rendering the text
             height, width = scribe_win.getmaxyx()
