@@ -63,7 +63,8 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
    Examples:
 
    ```Python
-   back, sel = menu(5, 2, ["Say Hello", "Write Something", "Read that something", "Quit"], [example_text, scribe_write, scribe_read, bye], 0, True, True)  # Example on how to use the menu function
+   menu_win = window(height - 5, width - 3, 4, 1, False)
+   back, sel = menu(["Say Hello", "Write Something", "Read that something", "Menu scroll test", "Quit"], [example_text, scribe_write, scribe_read, menu_scroll, bye], menu_win, 0, True, True) # Example of the menu function
    ```
 
    ```back``` will be true, if the menu was left using backspace, allowing for something like this:
