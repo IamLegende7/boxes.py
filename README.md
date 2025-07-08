@@ -42,21 +42,23 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
 
 4. ```menu```
 
-   This is a simple function to create a menu that can be navigated with the arrow-keys, enter and optionally backspace
+   This is a simple function to create a menu that can be navigated with the arrow-keys, enter and optionally backspace.
+
+   The menu function now scrolls, if not all entrys can be displayed at the same time, do to height constraints.
    
    Arguments:
    
-     1. ```y``` , ```x``` : y, x position
-   
-     2. ```options``` : a list of Strings to display as the options
-   
-     3. ```commands``` : a list of functions to call, corrosponding to the optiond, **DONT ADD THEM AS STRINGS (dont use "" or '')**
-   
-     4. ```selected_option``` : optional, starting posision of the "cursor", default 0
-   
-     5. ```bold``` : if the options are written bold
-   
-     6. ```allow_back``` : if backspace can be used to get out of the menu
+     1. ```options``` : a list of Strings to display as the options
+
+     2. ```commands``` : a list of functions to call, corrosponding to the optiond, **DONT ADD THEM AS STRINGS (dont use "" or '')**
+
+     3. ```menu_win``` : a window is required. Please dont use ```stdscr```; all contents of the window, except for the menu will be deleted.
+
+     3. ```selected_option``` : optional, starting posision of the "cursor", default 0
+
+     4. ```bold``` : if the options are written bold
+
+     5. ```allow_back``` : if backspace can be used to get out of the menu
 
    Examples:
 

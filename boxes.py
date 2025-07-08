@@ -65,55 +65,63 @@ def tui(stdscr):
             win.border(0)
         return win
 
-    def menu(y: int, x: int, options: list, commands: list, selected_option: int=0, bold: bool=False, allow_back: bool=False):
-        # Display the menu
-        for idx, option in enumerate(options):
-            if idx == selected_option:
-                if bold:
-                    stdscr.addstr(y + idx, x, option, curses.A_REVERSE | curses.A_BOLD)  # Highlight selected option
-                else:
-                    stdscr.addstr(y + idx, x, option, curses.A_REVERSE)  # Highlight selected option
-            else:
-                if bold:
-                    stdscr.addstr(y + idx, x, option, curses.A_BOLD)
-                else:
-                    stdscr.addstr(y + idx, x, option)
-        stdscr.refresh()
-        old_selected_option = None
-
+    def menu(options: list, commands: list, menu_win, selected_option: int=0, bold: bool=False, allow_back: bool=False):
+        menu_win.refresh()
+        height, width = menu_win.getmaxyx()
+        max_len = max(len(s) for s in options)
+        scroll = 0
+        menu_win.keypad(True)  # Enable keypad mode for proper key detection
         while True:
+            off_screen_up = False
+            off_screen_down = False
             # Refresh the menu
+            menu_win.clear()
             for idx, option in enumerate(options):
+                if idx - scroll < 0:
+                    off_screen_up = True
+                    continue
+                if idx - scroll > height - 1:
+                    off_screen_down = True
+                    continue
                 if idx == selected_option:
                     if bold:
-                        stdscr.addstr(y + idx, x, option, curses.A_REVERSE | curses.A_BOLD)  # Highlight selected option
+                        menu_win.addstr(idx - scroll, 0, option, curses.A_REVERSE | curses.A_BOLD)  # Highlight selected option
                     else:
-                        stdscr.addstr(y + idx, x, option, curses.A_REVERSE)  # Highlight selected option
-                if idx == old_selected_option:
+                        menu_win.addstr(idx - scroll, 0, option, curses.A_REVERSE)  # Highlight selected option
+                else:
                     if bold:
-                        stdscr.addstr(y + idx, x, option, curses.A_BOLD)  # "Unhighlight" the option no longer selected
+                        menu_win.addstr(idx - scroll, 0, option, curses.A_BOLD)
                     else:
-                        stdscr.addstr(y + idx, x, option)  # "Unhighlight" the option no longer selected
-            stdscr.refresh()
+                        menu_win.addstr(idx - scroll, 0, option)
+            menu_win.refresh()
+
+            if off_screen_up:
+                menu_win.addstr(0, max_len + 4, "^", curses.A_BOLD)
+            if off_screen_down:
+                menu_win.addstr(height - 1, max_len + 4, "v", curses.A_BOLD)
 
             # Get the pressed key
-            key = stdscr.getch()
-
+            key = menu_win.getch()
+            
             # Process keypresses
             if key == curses.KEY_UP:
                 if selected_option - 1 >= 0:
-                    old_selected_option = selected_option
                     selected_option -= 1  # Move up
+                    if selected_option <= 0 + scroll - 1:
+                        scroll -= 1
             elif key == curses.KEY_DOWN:
                 if selected_option + 1 <= len(options) - 1:
-                    old_selected_option = selected_option
                     selected_option += 1  # Move down
-
+                    if selected_option >= height + scroll:
+                        scroll += 1
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
                 commands[selected_option]()
                 return False, selected_option
             elif key in (curses.KEY_BACKSPACE, 127, 8):
                 if allow_back:
+                    menu_win.clear()
+                    menu_win.refresh()
+                    curses.curs_set(0) 
                     return True, selected_option
     
     def scribe(scribe_win, scribe_text: str = "", read_only: bool=False):
@@ -344,14 +352,31 @@ def tui(stdscr):
         stdscr.getch()
         return
 
-    def main():
+    def menu_scroll():
         stdscr.clear()
         height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")  # Example for the box function
-        stdscr.addstr(1, 2, "Main Menu")
+        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        stdscr.addstr(1, 2, "Menu Scroll Tests")
         box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+        menu_win = window(height - 5, width - 3, 4, 1, False)
+        entrys = []
+        commands = []
+        for i in range(0, 25):
+            entrys.append(str(i))
+            commands.append(example_text)
+        entrys.append("Quit")
+        commands.append(bye)
+        menu(entrys, commands, menu_win, 0, True, True)
+
+    def main():
         while True:
-            back, sel = menu(5, 2, ["Say Hello", "Write Something", "Read that something", "Quit"], [example_text, scribe_write, scribe_read, bye], 0, True, True)  # Example on how to use the menu function
+            stdscr.clear()
+            height, width = stdscr.getmaxyx()
+            box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")  # Example for the box function
+            stdscr.addstr(1, 2, "Main Menu")
+            box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
+            menu_win = window(height - 5, width - 3, 4, 1, False)
+            back, sel = menu(["Say Hello", "Write Something", "Read that something", "Menu scroll test", "Quit"], [example_text, scribe_write, scribe_read, menu_scroll, bye], menu_win, 0, True, True)  # Example on how to use the menu function
             if back:    # You can also do something when backspace is pressed (like go back one page or something) ... have to set allow_back = True
                 back_page(sel)
 
