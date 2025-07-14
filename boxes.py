@@ -66,16 +66,29 @@ def tui(stdscr):
         return win
 
     def menu(options: list, commands: list, menu_win, selected_option: int=0, bold: bool=False, allow_back: bool=False):
-        menu_win.refresh()
-        height, width = menu_win.getmaxyx()
+        height = menu_win.getmaxyx()[0]
         max_len = max(len(s) for s in options)
         scroll = 0
+        # Draw the menu once
+        for idx, option in enumerate(options):
+            if idx == selected_option:
+                if bold:
+                    menu_win.addstr(idx, 0, option, curses.A_REVERSE | curses.A_BOLD)  # Highlight selected option
+                else:
+                    menu_win.addstr(idx, 0, option, curses.A_REVERSE)  # Highlight selected option
+            else:
+                if bold:
+                    menu_win.addstr(idx, 0, option, curses.A_BOLD)
+                else:
+                    menu_win.addstr(idx, 0, option)
         menu_win.keypad(True)  # Enable keypad mode for proper key detection
+        old_selected_option = None
+        menu_win.refresh()
         while True:
             off_screen_up = False
             off_screen_down = False
             # Refresh the menu
-            menu_win.clear()
+            #menu_win.clear()
             for idx, option in enumerate(options):
                 if idx - scroll < 0:
                     off_screen_up = True
@@ -88,17 +101,18 @@ def tui(stdscr):
                         menu_win.addstr(idx - scroll, 0, option, curses.A_REVERSE | curses.A_BOLD)  # Highlight selected option
                     else:
                         menu_win.addstr(idx - scroll, 0, option, curses.A_REVERSE)  # Highlight selected option
-                else:
+                elif idx == old_selected_option:
                     if bold:
                         menu_win.addstr(idx - scroll, 0, option, curses.A_BOLD)
                     else:
                         menu_win.addstr(idx - scroll, 0, option)
-            menu_win.refresh()
 
             if off_screen_up:
                 menu_win.addstr(0, max_len + 4, "^", curses.A_BOLD)
             if off_screen_down:
                 menu_win.addstr(height - 1, max_len + 4, "v", curses.A_BOLD)
+
+            old_selected_option = selected_option
 
             # Get the pressed key
             key = menu_win.getch()
@@ -117,12 +131,11 @@ def tui(stdscr):
             elif key == curses.KEY_ENTER or key == 10:  # Enter key
                 commands[selected_option]()
                 return False, selected_option
-            elif key in (curses.KEY_BACKSPACE, 127, 8):
-                if allow_back:
-                    menu_win.clear()
-                    menu_win.refresh()
-                    curses.curs_set(0) 
-                    return True, selected_option
+            elif key in (curses.KEY_BACKSPACE, 127, 8) and allow_back:
+                menu_win.clear()
+                menu_win.refresh()
+                curses.curs_set(0) 
+                return True, selected_option
     
     def scribe(scribe_win, scribe_text: str = "", read_only: bool=False):
         scroll = 0
