@@ -88,7 +88,6 @@ def tui(stdscr):
             off_screen_up = False
             off_screen_down = False
             # Refresh the menu
-            #menu_win.clear()
             for idx, option in enumerate(options):
                 if idx - scroll < 0:
                     off_screen_up = True
@@ -139,7 +138,8 @@ def tui(stdscr):
     
     def scribe(scribe_win, scribe_text: str = "", read_only: bool=False):
         scroll = 0
-        max_width = stdscr.getmaxyx()[1]
+        scribe_win.keypad(True)  # Enable keypad mode for proper key detection
+        max_width = scribe_win.getmaxyx()[1]
         cursor_pos = 0
         curses.curs_set(1)
         key = False
@@ -305,12 +305,9 @@ def tui(stdscr):
                     cursor_y = y_pos
             lines = y_pos
             line_lengths.append(line_length)
-            stdscr.addstr(1, width - max(5, len(f"{cursor_x} {cursor_y}")) - 1, f"{cursor_x} {cursor_y}")
             scribe_win.move(cursor_y - scroll, cursor_x)
-            stdscr.refresh()
             scribe_win.refresh()
-            key = stdscr.getch()
-            stdscr.addstr(1, width - max(5, len(f"{cursor_x} {cursor_y}")) - 1, " " * max(5, len(f"{cursor_x} {cursor_y}")))
+            key = scribe_win.getch()
 
     # Pages
     def scribe_write():
