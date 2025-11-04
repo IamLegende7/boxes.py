@@ -23,6 +23,10 @@ class TUI:
     ##################
     ### MENU LOGIC ###
     ##################
+    
+    ### Helper functions ###
+    def nothing():
+        return None
     class Menu:
         def update_options(self):
             self.curses_options = 0
@@ -59,13 +63,10 @@ class TUI:
                         if self.selected_option >= self.height + self.scroll:
                             self.scroll += 1
                 case 10:
-                    if self.contents[self.selected_option][1] == "nothing":
-                        return False, self.selected_option
-                    else:
-                        self.contents[self.selected_option][1]()
+                    return self.selected_option, self.contents[self.selected_option][1]()
                 case curses.KEY_BACKSPACE, 127, 8:
                     if allow_back:
-                        return True, self.selected_option
+                        return self.selected_option, None
 
             ### DISPLAY MENU ###
             if self.full_refresh:

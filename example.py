@@ -15,7 +15,7 @@ def main(stdscr):
     tui = TUI()
 
     # Make new menu instance
-    main_menu = tui.Menu(stdscr, [("Hello", lambda: None), ("Example Page", lambda: None), ("Quit", quit_app)])
+    main_menu = tui.Menu(stdscr, [("Hello", tui.nothing), ("Example Page", tui.nothing), ("Quit", quit_app)])
     
     # set the key to anything. Its recomended do use ```None```
     key = None
