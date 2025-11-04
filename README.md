@@ -57,7 +57,7 @@ See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) 
 
     **Ticking**
 
-    Ticking refreshes the menu and processes keypresses. For values it returns, see <Returns>
+    Ticking refreshes the menu and processes keypresses. For values it returns, see Returns
 
     You can tick the function using:
 
