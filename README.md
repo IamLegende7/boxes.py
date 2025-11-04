@@ -1,226 +1,83 @@
 # Boxes
 [![Python 3.13.5+](https://img.shields.io/badge/python-3.13.5+-blue.svg)](https://www.python.org/downloads/) [![License: 2-Clause-BSD](https://img.shields.io/badge/BSD-yellow.svg)](https://opensource.org/license/bsd-2-clause)
 
-Boxes is a template for my TUI python projects
+Boxes is a collection of tools for making TUI python projects.
 
 ## Dependencies
 
 Boxes uses curses, with comes with python, so nothing must be installed additionally
 
 ## How to use
-1. ```box```
 
-   This function draws a box (crazy, right?)
-   
-   Arguments:
-   
-     1. ```height``` and ```width```
-   
-     2. ```y``` , ```x``` : y, x position
-   
-     3. ```top``` : char used for  the top and bottom,
-   
-     4. ```side``` : char used for the left and right
-   
-     5. ```tl``` : char used for the top left corner
-   
-     6. ```tr``` : char used for the top right corner
-   
-     7. ```bl``` : char used for the bottom left corner
-   
-     8. ```br``` : char used for the bottom right corner
-   
-   Basic example:
-   ```Python
-   height, width = stdscr.getmaxyx()
-   box(height, width - 1, "━", "┃", "┏", "┓", "┗", "┛")    
-   ```
+### Setup
 
-3. ```window```
- 
-   This function just makes and returns a window. I will add more soon.
+First you will have to import the package:
 
-4. ```menu```
-
-   This is a simple function to create a menu that can be navigated with the arrow-keys, enter and optionally backspace.
-
-   The menu function now scrolls, if not all entrys can be displayed at the same time, do to height constraints.
-   
-   Arguments:
-   
-     1. ```options``` : a list of Strings to display as the options
-
-     2. ```commands``` : a list of functions to call, corrosponding to the optiond, **DONT ADD THEM AS STRINGS (dont use "" or '')**
-
-     3. ```menu_win``` : a window is required. Please dont use ```stdscr```; all contents of the window, except for the menu will be deleted.
-
-     3. ```selected_option``` : optional, starting posision of the "cursor", default 0
-
-     4. ```bold``` : if the options are written bold
-
-     5. ```allow_back``` : if backspace can be used to get out of the menu
-
-   Examples:
-
-   ```Python
-   menu_win = window(height - 5, width - 3, 4, 1, False)
-   back, sel = menu(["Say Hello", "Write Something", "Read that something", "Menu scroll test", "Quit"], [example_text, scribe_write, scribe_read, menu_scroll, bye], menu_win, 0, True, True) # Example of the menu function
-   ```
-
-   ```back``` will be true, if the menu was left using backspace, allowing for something like this:
-
-   ```Python
-   if back:
-       back() # Another function to call in this case
-   ```
-
-   ```sel``` will return the index of the currently selected option, no matter how the menu was left.
-
-   This is very useful, if you want the user to select from something else than a hardcoded list; you can use the function ```nothing``` in the commands-list (one for every entry is still required!) to only return the index, processing it outside of the menu function:
-
-   ```Python
-   options = []
-   commands = []
-   for x in options_to_process:
-       options.append(x)
-       commands.append(nothing)
-   back, sel = menu(0, 0, options, commands, 0, True, False)
-   chosen_option = options_to_process[sel]
-   ```
-5. ```scribe```
-    
-    Scribe is a simple text "editor". It allows for most characters to be written and can be navigated using the arrow-keys and home & end keys.
-    
-    It comes with text-wrap build-in.
-
-    It even has a srcolling feature for longer texts!
-
-    In the examples below, the function is used to write and read a file, called ```Text.txt```.
-
-    ```Python
-    def scribe_write():
-        text = ""
-        with open("Text.txt", "r") as txt_file:
-            for x in txt_file:
-                text = text + x
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
-        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        scribe_win = window(height - 5, width - 3, 4, 1, False)
-        text = scribe(scribe_win, text)
-        if not isinstance(text, bool):
-            with open("Text.txt", "w") as txt_file:
-                txt_file.write(text)
-        return
-    
-    def scribe_read():
-        text = ""
-        with open("Text.txt", "r") as txt_file:
-            for x in txt_file:
-                text = text + x
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-        box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
-        box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-        scribe_win = window(height - 5, width - 3, 4, 1, False)
-        scribe(scribe_win, text, True)
-        return
-    ```
-
-    The scribe function requires a window, to work in and a starting text in the form of a string.
-    
-    If the 3rd function, ```read_only``, is set to ```True``` the text can only be viewed, not edited.
-
-    The scribe function will return the edited Text, if the editor was left with F2 (aka the text was saved), otherwise it will return ```False```.
-
-## Structure
-
-Obviosly not a must, but I like this structure
-
-**Pages**
-
-In the function ``` tui ``` remove (or change) the give examples listed under the comment ``` # Pages ```:
-
-```Python
-# Pages
-def scribe_write():
-    text = ""
-    with open("Text.txt", "r") as txt_file:
-        for x in txt_file:
-            text = text + x
-    stdscr.clear()
-    height, width = stdscr.getmaxyx()
-    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
-    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    scribe_win = window(height - 5, width - 3, 4, 1, False)
-    text = scribe(scribe_win, text)
-    if not isinstance(text, bool):
-        with open("Text.txt", "w") as txt_file:
-            txt_file.write(text)
-    return
-    
-def scribe_read():
-    text = ""
-    with open("Text.txt", "r") as txt_file:
-        for x in txt_file:
-            text = text + x
-    stdscr.clear()
-    height, width = stdscr.getmaxyx()
-    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(1, 2, "Scribe  ---  Save: F2  Exit: F4")
-    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    scribe_win = window(height - 5, width - 3, 4, 1, False)
-    scribe(scribe_win, text, True)
-    return
-
-def example_text():
-    stdscr.clear()
-    height, width = stdscr.getmaxyx()
-    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(1, 2, "Example Text")
-    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(5, 2, "Hello World!")
-    stdscr.getch()
-    return
-    
-def back_page(sel):
-    stdscr.clear()
-    height, width = stdscr.getmaxyx()
-    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(1, 2, "No")
-    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    stdscr.addstr(5, 2, "U cant back out of tis <3")
-    stdscr.addstr(7, 2, f"Selected option was: {sel}")
-    stdscr.getch()
-    return
-
-def main():
-    stdscr.clear()
-    height, width = stdscr.getmaxyx()
-    box(3, width - 1, 0, 0, "━", "┃", "┏", "┓", "┗", "┛")  # Example for the box function
-    stdscr.addstr(1, 2, "Main Menu")
-    box(height - 3, width - 1, 3, 0, "━", "┃", "┏", "┓", "┗", "┛")
-    while True:
-        back, sel = menu(5, 2, ["Say Hello", "Write Something", "Read that something", "Quit"], [example_text, scribe_write, scribe_read, bye], 0, True, True)  # Example on how to use the menu function
-        if back:    # You can also do something when backspace is pressed (like go back one page or something) ... have to set allow_back = True though
-            back_page(sel)
+```python
+import curses
+from boxes-tui import TUI
 ```
-You can then later call these functions to call the diffrent pages you want.
 
-**Main code**
+Now you will need to create a new TUI object intance:
 
-Under the comment ``` # Main code ``` (still in the ``` tui ``` function) you can add your main code.
-
-Again: you would want to add all the page-related code to the pages functions, however here you can call the first page and set some varibles first
-
-```Python
-    # Main code
-    main() # Calling the first page
+```python
+my_tui = TUI()
 ```
+
+After that you can use the tools that this package supplies.
+
+### Tool usage
+
+See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) for a basic TUI script example.
+
+1. Menu
+
+    **Creation**
+
+        This simple menu is navigatable by arrow keys and enter.
+
+        You have to pass in the lable and a function to execute; all in a list.
+
+        Here is an example for a super basic menu:
+
+        ```python
+        my_menu = tui.Menu(stdscr, [("Hello", tui.nothing), ("Quit", quit_app)])
+        ```
+
+        Here the entrys get stored as a list of tuples of ```(label, function_to_call)```
+
+
+        As you can see, you also put in a window. Its values (aka the origin coord and the height & width) will be used for the Menu.
+
+        You can chage them later using:
+
+        ```python
+        my_menu.chage_values(x, y, width, height)
+        ```
+
+    **Ticking**
+
+        Ticking refreshes the menu and processes keypresses. For values it returns, see <Returns>
+
+        You can tick the function using:
+
+        ```python
+        my_menu.tick(key)
+        ```
+
+        ```key``` can be gotten by using:
+
+        ```python
+        key = stdsrc.getch()
+        ```    
+
+    **Returns**
+
+        When ticking the menu it may (when the user presses <enter> or <backspace>) return a tuple of ```(index, return_of_the_function)```
+
+        Were ```index``` is the index of the entry the user selected. -1 if the user pressed backspace.
+
+        ```return_of_the_function``` is whatever the function may have returned, that has been called by the menu.
 
 ##
 If you encounter any bug, optimization issue or anything else you would like me to change, please feel free to let me know :)
