@@ -73,7 +73,7 @@ See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) 
 
     **Returns**
 
-    When ticking the menu it may (when the user presses <enter> or <backspace>) return a tuple of ```(index, return_of_the_function)```
+    When ticking, the menu it may (when the user presses "enter" or "backspace") return a tuple of ```(index, return_of_the_function)```
 
     Were ```index``` is the index of the entry the user selected. -1 if the user pressed backspace.
 
