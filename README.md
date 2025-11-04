@@ -53,7 +53,7 @@ See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) 
 
     ```python
     my_menu.chage_values(x, y, width, height)
-        ```
+    ```
 
     **Ticking**
 
