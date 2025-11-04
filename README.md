@@ -15,7 +15,7 @@ First you will have to import the package:
 
 ```python
 import curses
-from boxes-tui import TUI
+from boxes_tui import TUI
 ```
 
 Now you will need to create a new TUI object intance:

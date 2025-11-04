@@ -1,5 +1,5 @@
 import curses           # For now you still need to import curses
-from boxes import TUI
+from boxes_tui import TUI
 
 # A simple example for boxes.py usage
 
