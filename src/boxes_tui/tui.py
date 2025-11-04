@@ -133,11 +133,18 @@ class TUI:
     ##################
     ### INIT LOGIC ###
     ##################
-    def __init__(self):
-        ### TREM ###
+    def __init__(self, stdscr = None):
+        ### TERM ###
+        if stdscr is None: # No wrapper
+            self.stdscrcurses.initscr()
+            self.call_endwin = True
+        else:              # Wrapper
+            self.stdscr = stdscr
+            self.call_endwin = False
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
+        self.stdscr.keypad(True)
 
         ### COLOURS ###
         curses.start_color()
@@ -152,4 +159,7 @@ class TUI:
 
     def cleanup(self):
         curses.nocbreak()
+        self.stdscr.keypad(False)
         curses.echo()
+        if self.call_endwin:
+            curses.endwin()
