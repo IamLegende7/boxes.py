@@ -28,7 +28,7 @@ After that you can use the tools that this package supplies.
 
 ### Tool usage
 
-See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) for a basic TUI script example.
+See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/examples/example.py) for a basic TUI script example.
 
 1. Menu
 
