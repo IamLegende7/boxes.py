@@ -34,50 +34,50 @@ See [example.py](https://github.com/IamLegende7/boxes-tui/blob/main/example.py) 
 
     **Creation**
 
-        This simple menu is navigatable by arrow keys and enter.
+    This simple menu is navigatable by arrow keys and enter.
 
-        You have to pass in the lable and a function to execute; all in a list.
+    You have to pass in the lable and a function to execute; all in a list.
 
-        Here is an example for a super basic menu:
+    Here is an example for a super basic menu:
 
-        ```python
-        my_menu = tui.Menu(stdscr, [("Hello", tui.nothing), ("Quit", quit_app)])
-        ```
+    ```python
+    my_menu = tui.Menu(stdscr, [("Hello", tui.nothing), ("Quit", quit_app)])
+    ```
 
-        Here the entrys get stored as a list of tuples of ```(label, function_to_call)```
+    Here the entrys get stored as a list of tuples of ```(label, function_to_call)```
 
 
-        As you can see, you also put in a window. Its values (aka the origin coord and the height & width) will be used for the Menu.
+    As you can see, you also put in a window. Its values (aka the origin coord and the height & width) will be used for the Menu.
 
-        You can chage them later using:
+    You can chage them later using:
 
-        ```python
-        my_menu.chage_values(x, y, width, height)
+    ```python
+    my_menu.chage_values(x, y, width, height)
         ```
 
     **Ticking**
 
-        Ticking refreshes the menu and processes keypresses. For values it returns, see <Returns>
+    Ticking refreshes the menu and processes keypresses. For values it returns, see <Returns>
 
-        You can tick the function using:
+    You can tick the function using:
 
-        ```python
-        my_menu.tick(key)
-        ```
+    ```python
+    my_menu.tick(key)
+    ```
 
-        ```key``` can be gotten by using:
+    ```key``` can be gotten by using:
 
-        ```python
-        key = stdsrc.getch()
-        ```    
+    ```python
+    key = stdsrc.getch()
+    ```    
 
     **Returns**
 
-        When ticking the menu it may (when the user presses <enter> or <backspace>) return a tuple of ```(index, return_of_the_function)```
+    When ticking the menu it may (when the user presses <enter> or <backspace>) return a tuple of ```(index, return_of_the_function)```
 
-        Were ```index``` is the index of the entry the user selected. -1 if the user pressed backspace.
+    Were ```index``` is the index of the entry the user selected. -1 if the user pressed backspace.
 
-        ```return_of_the_function``` is whatever the function may have returned, that has been called by the menu.
+    ```return_of_the_function``` is whatever the function may have returned, that has been called by the menu.
 
 ##
 If you encounter any bug, optimization issue or anything else you would like me to change, please feel free to let me know :)
