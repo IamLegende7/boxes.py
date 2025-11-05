@@ -14,7 +14,6 @@ Boxes uses curses, with comes with python, so nothing must be installed addition
 First you will have to import the package:
 
 ```python
-import curses
 from boxes_tui import TUI
 ```
 
@@ -25,6 +24,39 @@ my_tui = TUI()
 ```
 
 After that you can use the tools that this package supplies.
+
+### Curses Wrapper
+
+It is adviced to use the curses wrapper. It supports error handling, in the case your program terminates before calling:
+
+```python
+my_tui.cleanup()
+```
+
+To use the wrapper you will have to import:
+
+```python
+from curses import wrapper
+from boxes_tui import TUI
+```
+
+Change your main function to take in the parameter ```stdsrc```:
+
+```python
+def main(srdsrc):
+```
+
+and call it using:
+
+```python
+wrapper(main)
+```
+
+You will also need to construct the TUI opject with ```stdsrc```:
+
+```python
+my_tui = TUI(stdsrc)
+```
 
 ### Tool usage
 
