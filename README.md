@@ -1,5 +1,5 @@
 # Boxes
-[![Python 3.13.5+](https://img.shields.io/badge/python-3.13.5+-blue.svg)](https://www.python.org/downloads/) [![License: 2-Clause-BSD](https://img.shields.io/badge/BSD-yellow.svg)](https://opensource.org/license/bsd-2-clause)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/) [![License: 2-Clause-BSD](https://img.shields.io/badge/BSD-yellow.svg)](https://opensource.org/license/bsd-2-clause)
 
 Boxes is a collection of tools for making TUI python projects.
 
