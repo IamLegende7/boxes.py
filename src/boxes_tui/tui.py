@@ -40,6 +40,11 @@ class TUI:
             window.addstr(coords[1] + i, 0, f"{side}")
             window.addstr(coords[1] + i, coords[0] + size[0] - 1, f"{side}")
 
+    def make_window(x, y, height, width):
+        new_window = curses.newwin(height, width, y, x)
+        new_window.keypad(True)
+        return new_window
+
     ##################
     ### MENU LOGIC ###
     ##################
@@ -70,6 +75,9 @@ class TUI:
                 return 1
 
         def tick(self, keypress):
+            ### UPDATE COORDS & SIZE ###
+            self.height, self.width = self.menu_win.getmaxyx()
+            self.win_origin_coords = self.menu_win.getparyx()
             ### PROCCESS KEYPRESSES ###
             match keypress:
                 case curses.KEY_UP:
@@ -100,14 +108,15 @@ class TUI:
                 self.display_entry(self.contents[self.old_selected_option][0], self.old_selected_option)
                 self.display_entry(self.contents[self.selected_option][0], self.selected_option)
             
-            self.menu_pad.refresh(0,0, self.scroll,0, self.height+self.scroll,self.width)
+            self.menu_pad.refresh(win_origin_coords[0],win_origin_coords[1], self.scroll,0, self.height+self.scroll,self.width)
 
         # Contents must be fed into like this:
         # [(name, funtion to call)]
         def __init__(self, menu_win, contents, allow_back: bool = False):
             ### WIN / PAD SETUP ###
-            self.height, self.width = menu_win.getmaxyx()
-            self.win_origin_coords = menu_win.getparyx()
+            self.menu_win = menu_win
+            self.height, self.width = self.menu_win.getmaxyx()
+            self.win_origin_coords = self.menu_win.getparyx()
             self.pad_height = len(contents)
             self.pad_width = max(max(len(x[0]) for x in contents), self.width)
             self.menu_pad = curses.newpad(self.pad_height, self.pad_width)
@@ -128,7 +137,6 @@ class TUI:
             self.update_options()
 
             self.tick(None)
-            menu_win.refresh()
 
     ##################
     ### INIT LOGIC ###
@@ -151,11 +159,12 @@ class TUI:
         self.init_colours()
 
     def init_colours(self):
+        curses.use_default_colors()
         #curses.init_pair(0, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        #curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
+        #curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        #curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        #curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
     def cleanup(self):
         curses.nocbreak()
