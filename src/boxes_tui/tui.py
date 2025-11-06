@@ -40,25 +40,33 @@ class TUI:
             window.addstr(coords[1] + i, 0, f"{side}")
             window.addstr(coords[1] + i, coords[0] + size[0] - 1, f"{side}")
 
-    def make_window(x, y, height, width):
+    def make_window(x, y, width, height):
         new_window = curses.newwin(height, width, y, x)
         new_window.keypad(True)
         return new_window
+
+    def display_text(self, window, x: int, y: int, text: str, curses_options = 0):
+        text_split = text.split("%/")
+        if len(text_split) == 1:
+            text_clean = text_split[0]
+        else:
+            colour = text_split[0]
+            text_clean = text_split[1]
+        window.addstr(y, x, text_clean, curses.color_pair(colour) | curses_options)
+
 
     ##################
     ### MENU LOGIC ###
     ##################
     
     ### Helper functions ###
-    def nothing():
+    def nothing(self):
         return None
-    class Menu:
+    class Menu:            
         def update_options(self):
             self.curses_options = 0
             if self.bold:
-                self.curses_options |= curses.A_BOLD
-            if self.coulor != 0:
-                self.curses_options |= curses.color_pair(self.coulor)
+                self.curses_options = curses.A_BOLD
 
         def display_entry(self, entry_label: str, y: int):
             ### OPTIONS ###
@@ -67,9 +75,18 @@ class TUI:
             else:
                 entry_options = self.curses_options
 
+            text_split = entry_label.split("%/")
+            if len(text_split) == 1:
+                colour = 0                    
+                text_clean = text_split[0]
+            else:
+                colour = int(text_split[0])
+                text_clean = text_split[1]
+            
+
             ### DISPLAY ###
             try:
-                self.menu_pad.addstr(y, 0, entry_label, entry_options)
+                self.menu_pad.addstr(y, 0, text_clean, curses.color_pair(colour) | entry_options)
                 return 0
             except:
                 return 1
@@ -84,7 +101,7 @@ class TUI:
                     if self.selected_option - 1 >= 0:
                         self.selected_option -= 1
                         if self.selected_option <= 0 + self.scroll - 1:
-                            scroll -= 1
+                            self.scroll -= 1
                 case curses.KEY_DOWN:
                     if self.selected_option + 1 <= len(self.contents) - 1:
                         self.selected_option += 1
@@ -108,7 +125,7 @@ class TUI:
                 self.display_entry(self.contents[self.old_selected_option][0], self.old_selected_option)
                 self.display_entry(self.contents[self.selected_option][0], self.selected_option)
             
-            self.menu_pad.refresh(win_origin_coords[0],win_origin_coords[1], self.scroll,0, self.height+self.scroll,self.width)
+            self.menu_pad.refresh(self.win_origin_coords[0],self.win_origin_coords[1], self.scroll,0, self.height+self.scroll,self.width)
 
         # Contents must be fed into like this:
         # [(name, funtion to call)]
@@ -122,7 +139,6 @@ class TUI:
             self.menu_pad = curses.newpad(self.pad_height, self.pad_width)
 
             ### MENU SETTINGS SETUP ###
-            self.coulor = 0
             self.bold = False
             self.allow_back = allow_back
 
@@ -141,34 +157,40 @@ class TUI:
     ##################
     ### INIT LOGIC ###
     ##################
-    def __init__(self, stdscr = None):
+    def __init__(self, default_colors: bool = True, stdsrc = None):
         ### TERM ###
-        if stdscr is None: # No wrapper
-            self.stdscrcurses.initscr()
+        if stdsrc is None: # No wrapper
+            self.stdsrc = curses.initscr()
             self.call_endwin = True
         else:              # Wrapper
-            self.stdscr = stdscr
+            self.stdsrc = stdsrc
             self.call_endwin = False
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
-        self.stdscr.keypad(True)
+        self.stdsrc.keypad(True)
 
         ### COLOURS ###
         curses.start_color()
-        self.init_colours()
+        self.init_colours(default_colors)
 
-    def init_colours(self):
-        curses.use_default_colors()
-        #curses.init_pair(0, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        #curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-        #curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        #curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        #curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    def init_colours(self, default_colors: bool):
+        if default_colors:
+            curses.use_default_colors()
+            curses.init_pair(1, curses.COLOR_RED, -1)
+            curses.init_pair(2, curses.COLOR_GREEN, -1)
+            curses.init_pair(3, curses.COLOR_BLUE, -1)
+            curses.init_pair(4, curses.COLOR_YELLOW, -1)
+        else:
+            #curses.init_pair(0, curses.COLOR_WHITE, curses.COLOR_BLACK)
+            curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
+            curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
+            curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
     def cleanup(self):
         curses.nocbreak()
-        self.stdscr.keypad(False)
+        self.stdsrc.keypad(False)
         curses.echo()
         if self.call_endwin:
             curses.endwin()
